@@ -22,14 +22,14 @@ pub fn open_editor(
         .result
         .get(app.search.scroll)
         .unwrap()
-        .split(":")
+        .split(':')
         .collect::<Vec<&str>>();
 
     let (line, column) = (result[1], result[2]);
     let command = match editor.as_ref() {
         "vim" | "nvim" => format!("+normal {}G{}|", line, column),
         "emacs" => format!("+{}:{}", line, column),
-        _ => format!(""),
+        _ => String::new(),
     };
 
     let _ = tui.pause();
@@ -44,7 +44,7 @@ pub fn open_editor(
 }
 
 pub fn get_results(app: &mut App) -> anyhow::Result<()> {
-    if app.search.query.len() > 0 {
+    if !app.search.query.is_empty() {
         app.search.result = String::from_utf8_lossy(
             &Command::new("rg")
                 .args(&app.args)
@@ -70,7 +70,7 @@ pub fn get_results(app: &mut App) -> anyhow::Result<()> {
 }
 
 pub fn get_preview(app: &mut App) -> anyhow::Result<()> {
-    if app.search.result.len() == 0 {
+    if app.search.result.is_empty() {
         app.search.preview = String::new();
         return Ok(());
     }
@@ -79,7 +79,7 @@ pub fn get_preview(app: &mut App) -> anyhow::Result<()> {
         .result
         .get(app.search.scroll)
         .unwrap()
-        .split(":")
+        .split(':')
         .collect::<Vec<&str>>();
     let file = File::open(Path::new(result[0]));
 
@@ -96,7 +96,7 @@ pub fn get_preview(app: &mut App) -> anyhow::Result<()> {
             .lines()
             .enumerate()
             .skip(start)
-            .take_while(|&(index, _)| index + 1 <= end)
+            .take_while(|&(index, _)| index + 1 < end)
             .map(|(_, line)| line.unwrap_or("".to_string()))
             .collect::<Vec<String>>()
             .join("\n");
@@ -110,8 +110,6 @@ pub fn handle_vi_command(app: &mut App) -> anyhow::Result<()> {
     match app.vi_command.as_ref() {
         "gg" => {
             if app.window == Window::Search {
-                app.search.scroll = 0;
-            } else {
                 app.search.scroll = 0;
             }
         }

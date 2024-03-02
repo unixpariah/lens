@@ -41,19 +41,10 @@ impl Default for Search {
     }
 }
 
-#[derive(Debug, Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize, Default)]
 pub struct Command {
     pub cursor: usize,
     pub query: Vec<char>,
-}
-
-impl Default for Command {
-    fn default() -> Self {
-        Self {
-            cursor: 0,
-            query: Vec::new(),
-        }
-    }
 }
 
 #[derive(Debug, Serialize, Deserialize)]
